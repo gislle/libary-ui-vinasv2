@@ -1,264 +1,490 @@
--- Roblox UI Library Implementation
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+-- Roblox Exploit UI Library
+local Library = {Enabled = true}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
--- Create ScreenGui for the UI
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "SpeedControlUI"
-screenGui.Parent = playerGui
-screenGui.ResetOnSpawn = false
+-- Colors
+Library.AccentColor = Color3.fromRGB(97, 205, 187)
+Library.BackgroundColor = Color3.fromRGB(45, 45, 45)
+Library.SectionColor = Color3.fromRGB(35, 35, 35)
+Library.TextColor = Color3.fromRGB(255, 255, 255)
+Library.SubTextColor = Color3.fromRGB(180, 180, 180)
 
--- Main frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 500, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-mainFrame.BorderSizePixel = 0
-mainFrame.Parent = screenGui
-
--- Corner radius
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = mainFrame
-
--- Title bar
-local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1, 0, 0, 40)
-titleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-titleBar.BorderSizePixel = 0
-titleBar.Parent = mainFrame
-
-local titleCorner = Instance.new("UICorner")
-titleCorner.CornerRadius = UDim.new(0, 8)
-titleCorner.Parent = titleBar
-
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -20, 1, 0)
-title.Position = UDim2.new(0, 10, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Speed Control"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.Parent = titleBar
-
--- Close button
-local closeButton = Instance.new("TextButton")
-closeButton.Size = UDim2.new(0, 30, 0, 30)
-closeButton.Position = UDim2.new(1, -35, 0, 5)
-closeButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
-closeButton.Text = "X"
-closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-closeButton.Font = Enum.Font.GothamBold
-closeButton.TextSize = 14
-closeButton.Parent = titleBar
-
-local closeCorner = Instance.new("UICorner")
-closeCorner.CornerRadius = UDim.new(0, 15)
-closeCorner.Parent = closeButton
-
--- Content area
-local content = Instance.new("Frame")
-content.Size = UDim2.new(1, -20, 1, -60)
-content.Position = UDim2.new(0, 10, 0, 50)
-content.BackgroundTransparency = 1
-content.Parent = mainFrame
-
--- Section title
-local sectionTitle = Instance.new("TextLabel")
-sectionTitle.Size = UDim2.new(1, 0, 0, 30)
-sectionTitle.BackgroundTransparency = 1
-sectionTitle.Text = "Movement"
-sectionTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-sectionTitle.Font = Enum.Font.GothamBold
-sectionTitle.TextSize = 16
-sectionTitle.TextXAlignment = Enum.TextXAlignment.Left
-sectionTitle.Parent = content
-
--- Speed slider container
-local sliderContainer = Instance.new("Frame")
-sliderContainer.Size = UDim2.new(1, 0, 0, 60)
-sliderContainer.Position = UDim2.new(0, 0, 0, 30)
-sliderContainer.BackgroundTransparency = 1
-sliderContainer.Parent = content
-
--- Slider label
-local sliderLabel = Instance.new("TextLabel")
-sliderLabel.Size = UDim2.new(1, 0, 0, 20)
-sliderLabel.BackgroundTransparency = 1
-sliderLabel.Text = "Walk Speed: 16"
-sliderLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-sliderLabel.Font = Enum.Font.Gotham
-sliderLabel.TextSize = 14
-sliderLabel.TextXAlignment = Enum.TextXAlignment.Left
-sliderLabel.Parent = sliderContainer
-
--- Slider background
-local sliderBackground = Instance.new("Frame")
-sliderBackground.Size = UDim2.new(1, 0, 0, 20)
-sliderBackground.Position = UDim2.new(0, 0, 0, 25)
-sliderBackground.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-sliderBackground.Parent = sliderContainer
-
-local sliderBgCorner = Instance.new("UICorner")
-sliderBgCorner.CornerRadius = UDim.new(0, 10)
-sliderBgCorner.Parent = sliderBackground
-
--- Slider fill
-local sliderFill = Instance.new("Frame")
-sliderFill.Size = UDim2.new(0, 0, 1, 0)
-sliderFill.BackgroundColor3 = Color3.fromRGB(97, 205, 187)
-sliderFill.Parent = sliderBackground
-
-local sliderFillCorner = Instance.new("UICorner")
-sliderFillCorner.CornerRadius = UDim.new(0, 10)
-sliderFillCorner.Parent = sliderFill
-
--- Slider button
-local sliderButton = Instance.new("TextButton")
-sliderButton.Size = UDim2.new(0, 20, 2, 0)
-sliderButton.Position = UDim2.new(0, -10, -0.5, 0)
-sliderButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-sliderButton.Text = ""
-sliderButton.Parent = sliderFill
-
-local sliderBtnCorner = Instance.new("UICorner")
-sliderBtnCorner.CornerRadius = UDim.new(0, 10)
-sliderBtnCorner.Parent = sliderButton
-
--- Min and max labels
-local minLabel = Instance.new("TextLabel")
-minLabel.Size = UDim2.new(0, 30, 0, 20)
-minLabel.Position = UDim2.new(0, 0, 0, 50)
-minLabel.BackgroundTransparency = 1
-minLabel.Text = "16"
-minLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-minLabel.Font = Enum.Font.Gotham
-minLabel.TextSize = 12
-minLabel.Parent = sliderContainer
-
-local maxLabel = Instance.new("TextLabel")
-maxLabel.Size = UDim2.new(0, 30, 0, 20)
-maxLabel.Position = UDim2.new(1, -30, 0, 50)
-maxLabel.BackgroundTransparency = 1
-maxLabel.Text = "100"
-maxLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
-maxLabel.Font = Enum.Font.Gotham
-maxLabel.TextSize = 12
-maxLabel.TextXAlignment = Enum.TextXAlignment.Right
-maxLabel.Parent = sliderContainer
-
--- Toggle UI visibility button
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 120, 0, 40)
-toggleButton.Position = UDim2.new(0, 20, 1, -60)
-toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-toggleButton.Text = "Toggle UI"
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.Font = Enum.Font.Gotham
-toggleButton.TextSize = 14
-toggleButton.Parent = mainFrame
-
-local toggleCorner = Instance.new("UICorner")
-toggleCorner.CornerRadius = UDim.new(0, 8)
-toggleCorner.Parent = toggleButton
-
--- Function to update walk speed
-local function updateWalkSpeed(value)
-    sliderLabel.Text = "Walk Speed: " .. tostring(value)
-    local fillWidth = (value - 16) / (100 - 16)
-    sliderFill.Size = UDim2.new(fillWidth, 0, 1, 0)
+-- Create a new library instance
+function Library:New(config)
+    config = config or {}
+    local lib = {
+        Name = config.Name or "UI Library",
+        Size = config.Size or Vector2.new(500, 400),
+        Tabs = {},
+        CurrentTab = nil
+    }
     
-    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
-    if humanoid then
-        humanoid.WalkSpeed = value
-    end
-end
+    -- Create the main UI
+    lib.ScreenGui = Instance.new("ScreenGui")
+    lib.ScreenGui.Name = "LibUI"
+    lib.ScreenGui.ResetOnSpawn = false
+    lib.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    lib.ScreenGui.Parent = game:GetService("CoreGui") or game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Initialize slider
-updateWalkSpeed(16)
+    -- Main frame
+    lib.MainFrame = Instance.new("Frame")
+    lib.MainFrame.Size = UDim2.new(0, lib.Size.X, 0, lib.Size.Y)
+    lib.MainFrame.Position = UDim2.new(0.5, -lib.Size.X/2, 0.5, -lib.Size.Y/2)
+    lib.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    lib.MainFrame.BackgroundColor3 = Library.BackgroundColor
+    lib.MainFrame.BorderSizePixel = 0
+    lib.MainFrame.Parent = lib.ScreenGui
 
--- Make the window draggable
-local dragging = false
-local dragInput, dragStart, startPos
+    -- Corner radius
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = lib.MainFrame
 
-titleBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-        dragging = true
-        dragStart = input.Position
-        startPos = mainFrame.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                dragging = false
-            end
-        end)
-    end
-end)
+    -- Title bar
+    lib.TitleBar = Instance.new("Frame")
+    lib.TitleBar.Size = UDim2.new(1, 0, 0, 40)
+    lib.TitleBar.BackgroundColor3 = Library.SectionColor
+    lib.TitleBar.BorderSizePixel = 0
+    lib.TitleBar.Parent = lib.MainFrame
 
-titleBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement then
-        dragInput = input
-    end
-end)
+    local titleCorner = Instance.new("UICorner")
+    titleCorner.CornerRadius = UDim.new(0, 8)
+    titleCorner.Parent = lib.TitleBar
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and input == dragInput then
-        local delta = input.Position - dragStart
-        mainFrame.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
-    end
-end)
+    lib.Title = Instance.new("TextLabel")
+    lib.Title.Size = UDim2.new(1, -20, 1, 0)
+    lib.Title.Position = UDim2.new(0, 10, 0, 0)
+    lib.Title.BackgroundTransparency = 1
+    lib.Title.Text = lib.Name
+    lib.Title.TextColor3 = Library.TextColor
+    lib.Title.Font = Enum.Font.GothamBold
+    lib.Title.TextSize = 18
+    lib.Title.TextXAlignment = Enum.TextXAlignment.Left
+    lib.Title.Parent = lib.TitleBar
 
--- Close button functionality
-closeButton.MouseButton1Click:Connect(function()
-    screenGui.Enabled = not screenGui.Enabled
-end)
+    -- Close button
+    lib.CloseButton = Instance.new("TextButton")
+    lib.CloseButton.Size = UDim2.new(0, 30, 0, 30)
+    lib.CloseButton.Position = UDim2.new(1, -35, 0, 5)
+    lib.CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    lib.CloseButton.Text = "X"
+    lib.CloseButton.TextColor3 = Library.TextColor
+    lib.CloseButton.Font = Enum.Font.GothamBold
+    lib.CloseButton.TextSize = 14
+    lib.CloseButton.Parent = lib.TitleBar
 
--- Toggle button functionality
-toggleButton.MouseButton1Click:Connect(function()
-    screenGui.Enabled = not screenGui.Enabled
-end)
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 15)
+    closeCorner.Parent = lib.CloseButton
 
--- Slider functionality
-local function updateSlider(input)
-    if not input then return end
-    
-    local sliderAbsolutePosition = sliderBackground.AbsolutePosition
-    local sliderAbsoluteSize = sliderBackground.AbsoluteSize
-    
-    local relativeX = (input.Position.X - sliderAbsolutePosition.X) / sliderAbsoluteSize.X
-    relativeX = math.clamp(relativeX, 0, 1)
-    
-    local value = math.floor(16 + relativeX * (100 - 16))
-    updateWalkSpeed(value)
-end
+    -- Tabs container
+    lib.TabsContainer = Instance.new("Frame")
+    lib.TabsContainer.Size = UDim2.new(1, -20, 0, 30)
+    lib.TabsContainer.Position = UDim2.new(0, 10, 0, 45)
+    lib.TabsContainer.BackgroundTransparency = 1
+    lib.TabsContainer.Parent = lib.MainFrame
 
-sliderButton.MouseButton1Down:Connect(function()
-    local connection
-    connection = game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement then
-            updateSlider(input)
-        end
-    end)
-    
-    game:GetService("UserInputService").InputEnded:Connect(function(input)
+    -- Content area
+    lib.Content = Instance.new("Frame")
+    lib.Content.Size = UDim2.new(1, -20, 1, -85)
+    lib.Content.Position = UDim2.new(0, 10, 0, 80)
+    lib.Content.BackgroundTransparency = 1
+    lib.Content.Parent = lib.MainFrame
+
+    -- Make the window draggable
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    lib.TitleBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            connection:Disconnect()
+            dragging = true
+            dragStart = input.Position
+            startPos = lib.MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
         end
     end)
-end)
 
-sliderBackground.MouseButton1Down:Connect(function(input)
-    updateSlider(input)
-end)
+    lib.TitleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
 
--- Make UI visible by default
-screenGui.Enabled = true
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and input == dragInput then
+            local delta = input.Position - dragStart
+            lib.MainFrame.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
+        end
+    end)
 
-print("Speed Control UI loaded successfully!")
-print("Use the slider to adjust your character's walk speed")
-print("Click and drag the title bar to move the window")
-print("Use the close button or toggle button to show/hide the UI")
+    -- Close button functionality
+    lib.CloseButton.MouseButton1Click:Connect(function()
+        lib.ScreenGui.Enabled = not lib.ScreenGui.Enabled
+    end)
+
+    -- Toggle UI function
+    function lib:Toggle()
+        lib.ScreenGui.Enabled = not lib.ScreenGui.Enabled
+    end
+
+    -- Add tab function
+    function lib:AddTab(name)
+        local tab = {
+            Name = name,
+            Buttons = {},
+            Sections = {}
+        }
+        
+        -- Create tab button
+        tab.Button = Instance.new("TextButton")
+        tab.Button.Size = UDim2.new(0, 80, 1, 0)
+        tab.Button.Position = UDim2.new(0, (#lib.Tabs * 85), 0, 0)
+        tab.Button.BackgroundColor3 = Library.SectionColor
+        tab.Button.Text = name
+        tab.Button.TextColor3 = Library.SubTextColor
+        tab.Button.Font = Enum.Font.Gotham
+        tab.Button.TextSize = 14
+        tab.Button.Parent = lib.TabsContainer
+        
+        local tabCorner = Instance.new("UICorner")
+        tabCorner.CornerRadius = UDim.new(0, 6)
+        tabCorner.Parent = tab.Button
+        
+        -- Create tab content
+        tab.Container = Instance.new("ScrollingFrame")
+        tab.Container.Size = UDim2.new(1, 0, 1, 0)
+        tab.Container.Position = UDim2.new(0, 0, 0, 0)
+        tab.Container.BackgroundTransparency = 1
+        tab.Container.BorderSizePixel = 0
+        tab.Container.ScrollBarThickness = 4
+        tab.Container.Visible = false
+        tab.Container.Parent = lib.Content
+        
+        -- Tab click event
+        tab.Button.MouseButton1Click:Connect(function()
+            lib:SelectTab(tab)
+        end)
+        
+        table.insert(lib.Tabs, tab)
+        
+        -- Select first tab by default
+        if #lib.Tabs == 1 then
+            lib:SelectTab(tab)
+        end
+        
+        -- Add section function for this tab
+        function tab:AddSection(config)
+            config = config or {}
+            local section = {
+                Name = config.Name or "Section",
+                Buttons = {},
+                Toggles = {},
+                Sliders = {}
+            }
+            
+            -- Section container
+            section.Container = Instance.new("Frame")
+            section.Container.Size = UDim2.new(1, -10, 0, 40) -- Height will adjust
+            section.Container.Position = UDim2.new(0, 5, 0, (#tab.Sections * 45) + 5)
+            section.Container.BackgroundColor3 = Library.SectionColor
+            section.Container.Parent = tab.Container
+            
+            local sectionCorner = Instance.new("UICorner")
+            sectionCorner.CornerRadius = UDim.new(0, 6)
+            sectionCorner.Parent = section.Container
+            
+            -- Section title
+            section.Title = Instance.new("TextLabel")
+            section.Title.Size = UDim2.new(1, -10, 0, 20)
+            section.Title.Position = UDim2.new(0, 10, 0, 10)
+            section.Title.BackgroundTransparency = 1
+            section.Title.Text = section.Name
+            section.Title.TextColor3 = Library.TextColor
+            section.Title.Font = Enum.Font.GothamBold
+            section.Title.TextSize = 16
+            section.Title.TextXAlignment = Enum.TextXAlignment.Left
+            section.Title.Parent = section.Container
+            
+            -- Elements container
+            section.Elements = Instance.new("Frame")
+            section.Elements.Size = UDim2.new(1, -10, 0, 0)
+            section.Elements.Position = UDim2.new(0, 5, 0, 30)
+            section.Elements.BackgroundTransparency = 1
+            section.Elements.Parent = section.Container
+            
+            -- Add button function for this section
+            function section:AddButton(config)
+                config = config or {}
+                local button = {
+                    Name = config.Name or "Button",
+                    Callback = config.Callback or function() end
+                }
+                
+                button.Frame = Instance.new("Frame")
+                button.Frame.Size = UDim2.new(1, 0, 0, 30)
+                button.Frame.Position = UDim2.new(0, 0, 0, (#section.Buttons * 35))
+                button.Frame.BackgroundTransparency = 1
+                button.Frame.Parent = section.Elements
+                
+                button.Button = Instance.new("TextButton")
+                button.Button.Size = UDim2.new(1, 0, 0, 30)
+                button.Button.BackgroundColor3 = Library.AccentColor
+                button.Button.Text = button.Name
+                button.Button.TextColor3 = Library.TextColor
+                button.Button.Font = Enum.Font.Gotham
+                button.Button.TextSize = 14
+                button.Button.Parent = button.Frame
+                
+                local buttonCorner = Instance.new("UICorner")
+                buttonCorner.CornerRadius = UDim.new(0, 6)
+                buttonCorner.Parent = button.Button
+                
+                -- Button click event
+                button.Button.MouseButton1Click:Connect(function()
+                    button.Callback()
+                end)
+                
+                -- Update section height
+                section.Container.Size = UDim2.new(1, -10, 0, 40 + (#section.Buttons * 35) + 5)
+                
+                table.insert(section.Buttons, button)
+                return button
+            end
+            
+            -- Add toggle function for this section
+            function section:AddToggle(config)
+                config = config or {}
+                local toggle = {
+                    Name = config.Name or "Toggle",
+                    Default = config.Default or false,
+                    Callback = config.Callback or function() end
+                }
+                
+                toggle.Frame = Instance.new("Frame")
+                toggle.Frame.Size = UDim2.new(1, 0, 0, 30)
+                toggle.Frame.Position = UDim2.new(0, 0, 0, (#section.Toggles * 35))
+                toggle.Frame.BackgroundTransparency = 1
+                toggle.Frame.Parent = section.Elements
+                
+                toggle.Label = Instance.new("TextLabel")
+                toggle.Label.Size = UDim2.new(0.7, 0, 1, 0)
+                toggle.Label.BackgroundTransparency = 1
+                toggle.Label.Text = toggle.Name
+                toggle.Label.TextColor3 = Library.TextColor
+                toggle.Label.Font = Enum.Font.Gotham
+                toggle.Label.TextSize = 14
+                toggle.Label.TextXAlignment = Enum.TextXAlignment.Left
+                toggle.Label.Parent = toggle.Frame
+                
+                toggle.Button = Instance.new("TextButton")
+                toggle.Button.Size = UDim2.new(0, 50, 0, 25)
+                toggle.Button.Position = UDim2.new(1, -55, 0.5, -12.5)
+                toggle.Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+                toggle.Button.Text = ""
+                toggle.Button.Parent = toggle.Frame
+                
+                local toggleCorner = Instance.new("UICorner")
+                toggleCorner.CornerRadius = UDim.new(0, 12)
+                toggleCorner.Parent = toggle.Button
+                
+                toggle.Slider = Instance.new("Frame")
+                toggle.Slider.Size = UDim2.new(0, 20, 0, 20)
+                toggle.Slider.Position = UDim2.new(0, 3, 0.5, -10)
+                toggle.Slider.BackgroundColor3 = Library.TextColor
+                toggle.Slider.Parent = toggle.Button
+                
+                local sliderCorner = Instance.new("UICorner")
+                sliderCorner.CornerRadius = UDim.new(0, 10)
+                sliderCorner.Parent = toggle.Slider
+                
+                -- Set initial state
+                local function updateToggle(state)
+                    if state then
+                        toggle.Slider.Position = UDim2.new(0, 27, 0.5, -10)
+                        toggle.Button.BackgroundColor3 = Library.AccentColor
+                    else
+                        toggle.Slider.Position = UDim2.new(0, 3, 0.5, -10)
+                        toggle.Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+                    end
+                    toggle.Callback(state)
+                end
+                
+                updateToggle(toggle.Default)
+                
+                -- Toggle click event
+                toggle.Button.MouseButton1Click:Connect(function()
+                    toggle.Default = not toggle.Default
+                    updateToggle(toggle.Default)
+                end)
+                
+                -- Update section height
+                section.Container.Size = UDim2.new(1, -10, 0, 40 + (#section.Toggles * 35) + 5)
+                
+                table.insert(section.Toggles, toggle)
+                return toggle
+            end
+            
+            -- Add slider function for this section
+            function section:AddSlider(config)
+                config = config or {}
+                local slider = {
+                    Name = config.Name or "Slider",
+                    Min = config.Min or 0,
+                    Max = config.Max or 100,
+                    Default = config.Default or 50,
+                    Callback = config.Callback or function() end
+                }
+                
+                slider.Frame = Instance.new("Frame")
+                slider.Frame.Size = UDim2.new(1, 0, 0, 50)
+                slider.Frame.Position = UDim2.new(0, 0, 0, (#section.Sliders * 55))
+                slider.Frame.BackgroundTransparency = 1
+                slider.Frame.Parent = section.Elements
+                
+                slider.Label = Instance.new("TextLabel")
+                slider.Label.Size = UDim2.new(1, 0, 0, 20)
+                slider.Label.BackgroundTransparency = 1
+                slider.Label.Text = slider.Name .. ": " .. slider.Default
+                slider.Label.TextColor3 = Library.TextColor
+                slider.Label.Font = Enum.Font.Gotham
+                slider.Label.TextSize = 14
+                slider.Label.TextXAlignment = Enum.TextXAlignment.Left
+                slider.Label.Parent = slider.Frame
+                
+                slider.Background = Instance.new("Frame")
+                slider.Background.Size = UDim2.new(1, 0, 0, 20)
+                slider.Background.Position = UDim2.new(0, 0, 0, 25)
+                slider.Background.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                slider.Background.Parent = slider.Frame
+                
+                local bgCorner = Instance.new("UICorner")
+                bgCorner.CornerRadius = UDim.new(0, 10)
+                bgCorner.Parent = slider.Background
+                
+                slider.Fill = Instance.new("Frame")
+                slider.Fill.Size = UDim2.new(0, 0, 1, 0)
+                slider.Fill.BackgroundColor3 = Library.AccentColor
+                slider.Fill.Parent = slider.Background
+                
+                local fillCorner = Instance.new("UICorner")
+                fillCorner.CornerRadius = UDim.new(0, 10)
+                fillCorner.Parent = slider.Fill
+                
+                slider.Button = Instance.new("TextButton")
+                slider.Button.Size = UDim2.new(0, 20, 2, 0)
+                slider.Button.Position = UDim2.new(0, -10, -0.5, 0)
+                slider.Button.BackgroundColor3 = Library.TextColor
+                slider.Button.Text = ""
+                slider.Button.Parent = slider.Fill
+                
+                local btnCorner = Instance.new("UICorner")
+                btnCorner.CornerRadius = UDim.new(0, 10)
+                btnCorner.Parent = slider.Button
+                
+                -- Min and max labels
+                slider.MinLabel = Instance.new("TextLabel")
+                slider.MinLabel.Size = UDim2.new(0, 30, 0, 20)
+                slider.MinLabel.Position = UDim2.new(0, 0, 0, 45)
+                slider.MinLabel.BackgroundTransparency = 1
+                slider.MinLabel.Text = tostring(slider.Min)
+                slider.MinLabel.TextColor3 = Library.SubTextColor
+                slider.MinLabel.Font = Enum.Font.Gotham
+                slider.MinLabel.TextSize = 12
+                slider.MinLabel.Parent = slider.Frame
+                
+                slider.MaxLabel = Instance.new("TextLabel")
+                slider.MaxLabel.Size = UDim2.new(0, 30, 0, 20)
+                slider.MaxLabel.Position = UDim2.new(1, -30, 0, 45)
+                slider.MaxLabel.BackgroundTransparency = 1
+                slider.MaxLabel.Text = tostring(slider.Max)
+                slider.MaxLabel.TextColor3 = Library.SubTextColor
+                slider.MaxLabel.Font = Enum.Font.Gotham
+                slider.MaxLabel.TextSize = 12
+                slider.MaxLabel.TextXAlignment = Enum.TextXAlignment.Right
+                slider.MaxLabel.Parent = slider.Frame
+                
+                -- Function to update slider
+                function slider:Update(value)
+                    value = math.clamp(value, slider.Min, slider.Max)
+                    slider.Label.Text = slider.Name .. ": " .. tostring(value)
+                    local fillWidth = (value - slider.Min) / (slider.Max - slider.Min)
+                    slider.Fill.Size = UDim2.new(fillWidth, 0, 1, 0)
+                    slider.Callback(value)
+                end
+                
+                -- Set initial value
+                slider:Update(slider.Default)
+                
+                -- Slider functionality
+                local function updateSlider(input)
+                    if not input then return end
+                    
+                    local sliderAbsolutePosition = slider.Background.AbsolutePosition
+                    local sliderAbsoluteSize = slider.Background.AbsoluteSize
+                    
+                    local relativeX = (input.Position.X - sliderAbsolutePosition.X) / sliderAbsoluteSize.X
+                    relativeX = math.clamp(relativeX, 0, 1)
+                    
+                    local value = math.floor(slider.Min + relativeX * (slider.Max - slider.Min))
+                    slider:Update(value)
+                end
+                
+                slider.Button.MouseButton1Down:Connect(function()
+                    local connection
+                    connection = UserInputService.InputChanged:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseMovement then
+                            updateSlider(input)
+                        end
+                    end)
+                    
+                    UserInputService.InputEnded:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                            connection:Disconnect()
+                        end
+                    end)
+                end)
+                
+                slider.Background.MouseButton1Down:Connect(function(input)
+                    updateSlider(input)
+                end)
+                
+                -- Update section height
+                section.Container.Size = UDim2.new(1, -10, 0, 40 + (#section.Sliders * 55) + 5)
+                
+                table.insert(section.Sliders, slider)
+                return slider
+            end
+            
+            table.insert(tab.Sections, section)
+            return section
+        end
+        
+        return tab
+    end
+    
+    -- Select tab function
+    function lib:SelectTab(tab)
+        if lib.CurrentTab then
+            lib.CurrentTab.Button.BackgroundColor3 = Library.SectionColor
+            lib.CurrentTab.Button.TextColor3 = Library.SubTextColor
+            lib.CurrentTab.Container.Visible = false
+        end
+        
+        lib.CurrentTab = tab
+        tab.Button.BackgroundColor3 = Library.AccentColor
+        tab.Button.TextColor3 = Library.TextColor
+        tab.Container.Visible = true
+    end
+    
+    setmetatable(lib, self)
+    self.__index = self
+    return lib
+end
+
+return Library
