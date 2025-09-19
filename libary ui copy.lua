@@ -3,12 +3,12 @@ local Library = {Enabled = true}
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 
--- Colors
-Library.AccentColor = Color3.fromRGB(97, 205, 187)
-Library.BackgroundColor = Color3.fromRGB(45, 45, 45)
-Library.SectionColor = Color3.fromRGB(35, 35, 35)
-Library.TextColor = Color3.fromRGB(255, 255, 255)
-Library.SubTextColor = Color3.fromRGB(180, 180, 180)
+-- Colors - Purple theme
+Library.AccentColor = Color3.fromRGB(147, 112, 219)  -- Purple
+Library.BackgroundColor = Color3.fromRGB(20, 20, 20) -- Almost black
+Library.SectionColor = Color3.fromRGB(30, 30, 30)    -- Dark gray
+Library.TextColor = Color3.fromRGB(255, 255, 255)    -- White
+Library.SubTextColor = Color3.fromRGB(200, 200, 200) -- Light gray
 
 -- Create a new library instance
 function Library:New(config)
@@ -53,7 +53,7 @@ function Library:New(config)
     titleCorner.Parent = lib.TitleBar
 
     lib.Title = Instance.new("TextLabel")
-    lib.Title.Size = UDim2.new(1, -20, 1, 0)
+    lib.Title.Size = UDim2.new(1, -80, 1, 0)
     lib.Title.Position = UDim2.new(0, 10, 0, 0)
     lib.Title.BackgroundTransparency = 1
     lib.Title.Text = lib.Name
@@ -63,20 +63,47 @@ function Library:New(config)
     lib.Title.TextXAlignment = Enum.TextXAlignment.Left
     lib.Title.Parent = lib.TitleBar
 
-    -- Close button
+    -- Cat icon (using text as emoji since we can't load images directly)
+    lib.CatIcon = Instance.new("TextLabel")
+    lib.CatIcon.Size = UDim2.new(0, 30, 0, 30)
+    lib.CatIcon.Position = UDim2.new(1, -70, 0, 5)
+    lib.CatIcon.BackgroundTransparency = 1
+    lib.CatIcon.Text = "🐱"
+    lib.CatIcon.TextColor3 = Library.AccentColor
+    lib.CatIcon.Font = Enum.Font.GothamBold
+    lib.CatIcon.TextSize = 20
+    lib.CatIcon.Parent = lib.TitleBar
+
+    -- Close button (improved)
     lib.CloseButton = Instance.new("TextButton")
     lib.CloseButton.Size = UDim2.new(0, 30, 0, 30)
     lib.CloseButton.Position = UDim2.new(1, -35, 0, 5)
-    lib.CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
-    lib.CloseButton.Text = "X"
+    lib.CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     lib.CloseButton.TextColor3 = Library.TextColor
     lib.CloseButton.Font = Enum.Font.GothamBold
-    lib.CloseButton.TextSize = 14
+    lib.CloseButton.TextSize = 16
+    lib.CloseButton.Text = "×"
     lib.CloseButton.Parent = lib.TitleBar
 
     local closeCorner = Instance.new("UICorner")
-    closeCorner.CornerRadius = UDim.new(0, 15)
+    closeCorner.CornerRadius = UDim.new(0, 6)
     closeCorner.Parent = lib.CloseButton
+
+    -- Hide button
+    lib.HideButton = Instance.new("TextButton")
+    lib.HideButton.Size = UDim2.new(0, 30, 0, 30)
+    lib.HideButton.Position = UDim2.new(1, -70, 0, 5)
+    lib.HideButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    lib.HideButton.TextColor3 = Library.TextColor
+    lib.HideButton.Font = Enum.Font.GothamBold
+    lib.HideButton.TextSize = 16
+    lib.HideButton.Text = "_"
+    lib.HideButton.Visible = false -- Hide button is hidden by default
+    lib.HideButton.Parent = lib.TitleBar
+
+    local hideCorner = Instance.new("UICorner")
+    hideCorner.CornerRadius = UDim.new(0, 6)
+    hideCorner.Parent = lib.HideButton
 
     -- Tabs container
     lib.TabsContainer = Instance.new("Frame")
@@ -125,12 +152,36 @@ function Library:New(config)
 
     -- Close button functionality
     lib.CloseButton.MouseButton1Click:Connect(function()
-        lib.ScreenGui.Enabled = not lib.ScreenGui.Enabled
+        lib.ScreenGui:Destroy()
+    end)
+
+    -- Close button hover effects
+    lib.CloseButton.MouseEnter:Connect(function()
+        lib.CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
+    end)
+
+    lib.CloseButton.MouseLeave:Connect(function()
+        lib.CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    end)
+
+    -- Hide button functionality
+    lib.HideButton.MouseButton1Click:Connect(function()
+        lib.MainFrame.Visible = not lib.MainFrame.Visible
+    end)
+
+    -- Hide button hover effects
+    lib.HideButton.MouseEnter:Connect(function()
+        lib.HideButton.BackgroundColor3 = Library.AccentColor
+    end)
+
+    lib.HideButton.MouseLeave:Connect(function()
+        lib.HideButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     end)
 
     -- Toggle UI function
     function lib:Toggle()
-        lib.ScreenGui.Enabled = not lib.ScreenGui.Enabled
+        lib.MainFrame.Visible = not lib.MainFrame.Visible
+        lib.HideButton.Visible = true
     end
 
     -- Add tab function
@@ -163,12 +214,26 @@ function Library:New(config)
         tab.Container.BackgroundTransparency = 1
         tab.Container.BorderSizePixel = 0
         tab.Container.ScrollBarThickness = 4
+        tab.Container.ScrollBarImageColor3 = Library.AccentColor
         tab.Container.Visible = false
         tab.Container.Parent = lib.Content
         
         -- Tab click event
         tab.Button.MouseButton1Click:Connect(function()
             lib:SelectTab(tab)
+        end)
+        
+        -- Tab hover effects
+        tab.Button.MouseEnter:Connect(function()
+            if lib.CurrentTab ~= tab then
+                tab.Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            end
+        end)
+        
+        tab.Button.MouseLeave:Connect(function()
+            if lib.CurrentTab ~= tab then
+                tab.Button.BackgroundColor3 = Library.SectionColor
+            end
         end)
         
         table.insert(lib.Tabs, tab)
@@ -245,6 +310,15 @@ function Library:New(config)
                 buttonCorner.CornerRadius = UDim.new(0, 6)
                 buttonCorner.Parent = button.Button
                 
+                -- Button hover effects
+                button.Button.MouseEnter:Connect(function()
+                    button.Button.BackgroundColor3 = Color3.fromRGB(167, 132, 239) -- Lighter purple
+                end)
+                
+                button.Button.MouseLeave:Connect(function()
+                    button.Button.BackgroundColor3 = Library.AccentColor
+                end)
+                
                 -- Button click event
                 button.Button.MouseButton1Click:Connect(function()
                     button.Callback()
@@ -285,7 +359,7 @@ function Library:New(config)
                 toggle.Button = Instance.new("TextButton")
                 toggle.Button.Size = UDim2.new(0, 50, 0, 25)
                 toggle.Button.Position = UDim2.new(1, -55, 0.5, -12.5)
-                toggle.Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+                toggle.Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
                 toggle.Button.Text = ""
                 toggle.Button.Parent = toggle.Frame
                 
@@ -310,7 +384,7 @@ function Library:New(config)
                         toggle.Button.BackgroundColor3 = Library.AccentColor
                     else
                         toggle.Slider.Position = UDim2.new(0, 3, 0.5, -10)
-                        toggle.Button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+                        toggle.Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
                     end
                     toggle.Callback(state)
                 end
@@ -330,7 +404,7 @@ function Library:New(config)
                 return toggle
             end
             
-            -- Add slider function for this section
+            -- Add slider function for this section (improved)
             function section:AddSlider(config)
                 config = config or {}
                 local slider = {
@@ -338,7 +412,8 @@ function Library:New(config)
                     Min = config.Min or 0,
                     Max = config.Max or 100,
                     Default = config.Default or 50,
-                    Callback = config.Callback or function() end
+                    Callback = config.Callback or function() end,
+                    Precision = config.Precision or 1
                 }
                 
                 slider.Frame = Instance.new("Frame")
@@ -358,13 +433,13 @@ function Library:New(config)
                 slider.Label.Parent = slider.Frame
                 
                 slider.Background = Instance.new("Frame")
-                slider.Background.Size = UDim2.new(1, 0, 0, 20)
+                slider.Background.Size = UDim2.new(1, 0, 0, 15)
                 slider.Background.Position = UDim2.new(0, 0, 0, 25)
-                slider.Background.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                slider.Background.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
                 slider.Background.Parent = slider.Frame
                 
                 local bgCorner = Instance.new("UICorner")
-                bgCorner.CornerRadius = UDim.new(0, 10)
+                bgCorner.CornerRadius = UDim.new(0, 7)
                 bgCorner.Parent = slider.Background
                 
                 slider.Fill = Instance.new("Frame")
@@ -373,7 +448,7 @@ function Library:New(config)
                 slider.Fill.Parent = slider.Background
                 
                 local fillCorner = Instance.new("UICorner")
-                fillCorner.CornerRadius = UDim.new(0, 10)
+                fillCorner.CornerRadius = UDim.new(0, 7)
                 fillCorner.Parent = slider.Fill
                 
                 slider.Button = Instance.new("TextButton")
@@ -381,6 +456,7 @@ function Library:New(config)
                 slider.Button.Position = UDim2.new(0, -10, -0.5, 0)
                 slider.Button.BackgroundColor3 = Library.TextColor
                 slider.Button.Text = ""
+                slider.Button.ZIndex = 2
                 slider.Button.Parent = slider.Fill
                 
                 local btnCorner = Instance.new("UICorner")
@@ -390,7 +466,7 @@ function Library:New(config)
                 -- Min and max labels
                 slider.MinLabel = Instance.new("TextLabel")
                 slider.MinLabel.Size = UDim2.new(0, 30, 0, 20)
-                slider.MinLabel.Position = UDim2.new(0, 0, 0, 45)
+                slider.MinLabel.Position = UDim2.new(0, 0, 0, 40)
                 slider.MinLabel.BackgroundTransparency = 1
                 slider.MinLabel.Text = tostring(slider.Min)
                 slider.MinLabel.TextColor3 = Library.SubTextColor
@@ -400,7 +476,7 @@ function Library:New(config)
                 
                 slider.MaxLabel = Instance.new("TextLabel")
                 slider.MaxLabel.Size = UDim2.new(0, 30, 0, 20)
-                slider.MaxLabel.Position = UDim2.new(1, -30, 0, 45)
+                slider.MaxLabel.Position = UDim2.new(1, -30, 0, 40)
                 slider.MaxLabel.BackgroundTransparency = 1
                 slider.MaxLabel.Text = tostring(slider.Max)
                 slider.MaxLabel.TextColor3 = Library.SubTextColor
@@ -412,6 +488,11 @@ function Library:New(config)
                 -- Function to update slider
                 function slider:Update(value)
                     value = math.clamp(value, slider.Min, slider.Max)
+                    if slider.Precision == 1 then
+                        value = math.floor(value)
+                    else
+                        value = math.floor(value * (1/slider.Precision)) / (1/slider.Precision)
+                    end
                     slider.Label.Text = slider.Name .. ": " .. tostring(value)
                     local fillWidth = (value - slider.Min) / (slider.Max - slider.Min)
                     slider.Fill.Size = UDim2.new(fillWidth, 0, 1, 0)
@@ -431,7 +512,7 @@ function Library:New(config)
                     local relativeX = (input.Position.X - sliderAbsolutePosition.X) / sliderAbsoluteSize.X
                     relativeX = math.clamp(relativeX, 0, 1)
                     
-                    local value = math.floor(slider.Min + relativeX * (slider.Max - slider.Min))
+                    local value = slider.Min + relativeX * (slider.Max - slider.Min)
                     slider:Update(value)
                 end
                 
