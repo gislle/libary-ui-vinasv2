@@ -63,7 +63,7 @@ function Library:New(config)
     lib.Title.TextXAlignment = Enum.TextXAlignment.Left
     lib.Title.Parent = lib.TitleBar
 
-    -- Cat icon (using text as emoji since we can't load images directly)
+    -- Cat icon
     lib.CatIcon = Instance.new("TextLabel")
     lib.CatIcon.Size = UDim2.new(0, 30, 0, 30)
     lib.CatIcon.Position = UDim2.new(1, -70, 0, 5)
@@ -74,7 +74,7 @@ function Library:New(config)
     lib.CatIcon.TextSize = 20
     lib.CatIcon.Parent = lib.TitleBar
 
-    -- Close button (improved)
+    -- Close button
     lib.CloseButton = Instance.new("TextButton")
     lib.CloseButton.Size = UDim2.new(0, 30, 0, 30)
     lib.CloseButton.Position = UDim2.new(1, -35, 0, 5)
@@ -98,7 +98,7 @@ function Library:New(config)
     lib.HideButton.Font = Enum.Font.GothamBold
     lib.HideButton.TextSize = 16
     lib.HideButton.Text = "_"
-    lib.HideButton.Visible = false -- Hide button is hidden by default
+    lib.HideButton.Visible = false
     lib.HideButton.Parent = lib.TitleBar
 
     local hideCorner = Instance.new("UICorner")
@@ -255,7 +255,7 @@ function Library:New(config)
             
             -- Section container
             section.Container = Instance.new("Frame")
-            section.Container.Size = UDim2.new(1, -10, 0, 40) -- Height will adjust
+            section.Container.Size = UDim2.new(1, -10, 0, 40)
             section.Container.Position = UDim2.new(0, 5, 0, (#tab.Sections * 45) + 5)
             section.Container.BackgroundColor3 = Library.SectionColor
             section.Container.Parent = tab.Container
@@ -312,7 +312,7 @@ function Library:New(config)
                 
                 -- Button hover effects
                 button.Button.MouseEnter:Connect(function()
-                    button.Button.BackgroundColor3 = Color3.fromRGB(167, 132, 239) -- Lighter purple
+                    button.Button.BackgroundColor3 = Color3.fromRGB(167, 132, 239)
                 end)
                 
                 button.Button.MouseLeave:Connect(function()
@@ -404,7 +404,7 @@ function Library:New(config)
                 return toggle
             end
             
-            -- Add slider function for this section (improved)
+            -- Add slider function for this section (FIXED - no button)
             function section:AddSlider(config)
                 config = config or {}
                 local slider = {
@@ -451,17 +451,18 @@ function Library:New(config)
                 fillCorner.CornerRadius = UDim.new(0, 7)
                 fillCorner.Parent = slider.Fill
                 
-                slider.Button = Instance.new("TextButton")
-                slider.Button.Size = UDim2.new(0, 20, 2, 0)
-                slider.Button.Position = UDim2.new(0, -10, -0.5, 0)
-                slider.Button.BackgroundColor3 = Library.TextColor
-                slider.Button.Text = ""
-                slider.Button.ZIndex = 2
-                slider.Button.Parent = slider.Fill
+                -- Slider handle (no button, just a visual element)
+                slider.Handle = Instance.new("Frame")
+                slider.Handle.Size = UDim2.new(0, 6, 2, 0)
+                slider.Handle.Position = UDim2.new(0, -3, -0.5, 0)
+                slider.Handle.BackgroundColor3 = Library.TextColor
+                slider.Handle.BorderSizePixel = 0
+                slider.Handle.ZIndex = 2
+                slider.Handle.Parent = slider.Fill
                 
-                local btnCorner = Instance.new("UICorner")
-                btnCorner.CornerRadius = UDim.new(0, 10)
-                btnCorner.Parent = slider.Button
+                local handleCorner = Instance.new("UICorner")
+                handleCorner.CornerRadius = UDim.new(0, 3)
+                handleCorner.Parent = slider.Handle
                 
                 -- Min and max labels
                 slider.MinLabel = Instance.new("TextLabel")
@@ -502,7 +503,7 @@ function Library:New(config)
                 -- Set initial value
                 slider:Update(slider.Default)
                 
-                -- Slider functionality
+                -- Slider functionality (click and drag on the background)
                 local function updateSlider(input)
                     if not input then return end
                     
@@ -516,7 +517,10 @@ function Library:New(config)
                     slider:Update(value)
                 end
                 
-                slider.Button.MouseButton1Down:Connect(function()
+                -- Make the entire slider background draggable
+                slider.Background.MouseButton1Down:Connect(function(input)
+                    updateSlider(input)
+                    
                     local connection
                     connection = UserInputService.InputChanged:Connect(function(input)
                         if input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -529,10 +533,6 @@ function Library:New(config)
                             connection:Disconnect()
                         end
                     end)
-                end)
-                
-                slider.Background.MouseButton1Down:Connect(function(input)
-                    updateSlider(input)
                 end)
                 
                 -- Update section height
