@@ -1,28 +1,28 @@
--- Roblox Exploit UI Library
-local Library = {Enabled = true}
-local TweenService = game:GetService("TweenService")
+-- Crona UI Library
+local Crona = {}
 local UserInputService = game:GetService("UserInputService")
 
--- Colors - Purple theme
-Library.AccentColor = Color3.fromRGB(147, 112, 219)  -- Purple
-Library.BackgroundColor = Color3.fromRGB(20, 20, 20) -- Almost black
-Library.SectionColor = Color3.fromRGB(30, 30, 30)    -- Dark gray
-Library.TextColor = Color3.fromRGB(255, 255, 255)    -- White
-Library.SubTextColor = Color3.fromRGB(200, 200, 200) -- Light gray
+-- Colors - Purple and black theme
+Crona.AccentColor = Color3.fromRGB(147, 112, 219)  -- Purple
+Crona.BackgroundColor = Color3.fromRGB(20, 20, 20) -- Black
+Crona.SectionColor = Color3.fromRGB(30, 30, 30)    -- Dark gray
+Crona.TextColor = Color3.fromRGB(255, 255, 255)    -- White
+Crona.SubTextColor = Color3.fromRGB(200, 200, 200) -- Light gray
 
 -- Create a new library instance
-function Library:New(config)
+function Crona:New(config)
     config = config or {}
     local lib = {
-        Name = config.Name or "UI Library",
+        Name = config.Name or "Crona UI",
         Size = config.Size or Vector2.new(500, 400),
         Tabs = {},
-        CurrentTab = nil
+        CurrentTab = nil,
+        Visible = true
     }
     
     -- Create the main UI
     lib.ScreenGui = Instance.new("ScreenGui")
-    lib.ScreenGui.Name = "LibUI"
+    lib.ScreenGui.Name = "CronaUI"
     lib.ScreenGui.ResetOnSpawn = false
     lib.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     lib.ScreenGui.Parent = game:GetService("CoreGui") or game.Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -32,7 +32,7 @@ function Library:New(config)
     lib.MainFrame.Size = UDim2.new(0, lib.Size.X, 0, lib.Size.Y)
     lib.MainFrame.Position = UDim2.new(0.5, -lib.Size.X/2, 0.5, -lib.Size.Y/2)
     lib.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    lib.MainFrame.BackgroundColor3 = Library.BackgroundColor
+    lib.MainFrame.BackgroundColor3 = Crona.BackgroundColor
     lib.MainFrame.BorderSizePixel = 0
     lib.MainFrame.Parent = lib.ScreenGui
 
@@ -44,7 +44,7 @@ function Library:New(config)
     -- Title bar
     lib.TitleBar = Instance.new("Frame")
     lib.TitleBar.Size = UDim2.new(1, 0, 0, 40)
-    lib.TitleBar.BackgroundColor3 = Library.SectionColor
+    lib.TitleBar.BackgroundColor3 = Crona.SectionColor
     lib.TitleBar.BorderSizePixel = 0
     lib.TitleBar.Parent = lib.MainFrame
 
@@ -53,52 +53,40 @@ function Library:New(config)
     titleCorner.Parent = lib.TitleBar
 
     lib.Title = Instance.new("TextLabel")
-    lib.Title.Size = UDim2.new(1, -80, 1, 0)
+    lib.Title.Size = UDim2.new(1, -100, 1, 0)
     lib.Title.Position = UDim2.new(0, 10, 0, 0)
     lib.Title.BackgroundTransparency = 1
     lib.Title.Text = lib.Name
-    lib.Title.TextColor3 = Library.TextColor
+    lib.Title.TextColor3 = Crona.AccentColor
     lib.Title.Font = Enum.Font.GothamBold
     lib.Title.TextSize = 18
     lib.Title.TextXAlignment = Enum.TextXAlignment.Left
     lib.Title.Parent = lib.TitleBar
-
-    -- Cat icon
-    lib.CatIcon = Instance.new("TextLabel")
-    lib.CatIcon.Size = UDim2.new(0, 30, 0, 30)
-    lib.CatIcon.Position = UDim2.new(1, -70, 0, 5)
-    lib.CatIcon.BackgroundTransparency = 1
-    lib.CatIcon.Text = "🐱"
-    lib.CatIcon.TextColor3 = Library.AccentColor
-    lib.CatIcon.Font = Enum.Font.GothamBold
-    lib.CatIcon.TextSize = 20
-    lib.CatIcon.Parent = lib.TitleBar
 
     -- Close button
     lib.CloseButton = Instance.new("TextButton")
     lib.CloseButton.Size = UDim2.new(0, 30, 0, 30)
     lib.CloseButton.Position = UDim2.new(1, -35, 0, 5)
     lib.CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    lib.CloseButton.TextColor3 = Library.TextColor
+    lib.CloseButton.TextColor3 = Crona.TextColor
     lib.CloseButton.Font = Enum.Font.GothamBold
     lib.CloseButton.TextSize = 16
-    lib.CloseButton.Text = "×"
+    lib.CloseButton.Text = "X"
     lib.CloseButton.Parent = lib.TitleBar
 
     local closeCorner = Instance.new("UICorner")
     closeCorner.CornerRadius = UDim.new(0, 6)
     closeCorner.Parent = lib.CloseButton
 
-    -- Hide button
+    -- Hide button (SIMPLE)
     lib.HideButton = Instance.new("TextButton")
     lib.HideButton.Size = UDim2.new(0, 30, 0, 30)
     lib.HideButton.Position = UDim2.new(1, -70, 0, 5)
     lib.HideButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    lib.HideButton.TextColor3 = Library.TextColor
+    lib.HideButton.TextColor3 = Crona.TextColor
     lib.HideButton.Font = Enum.Font.GothamBold
     lib.HideButton.TextSize = 16
     lib.HideButton.Text = "_"
-    lib.HideButton.Visible = false
     lib.HideButton.Parent = lib.TitleBar
 
     local hideCorner = Instance.new("UICorner")
@@ -155,33 +143,14 @@ function Library:New(config)
         lib.ScreenGui:Destroy()
     end)
 
-    -- Close button hover effects
-    lib.CloseButton.MouseEnter:Connect(function()
-        lib.CloseButton.BackgroundColor3 = Color3.fromRGB(220, 60, 60)
-    end)
-
-    lib.CloseButton.MouseLeave:Connect(function()
-        lib.CloseButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    end)
-
-    -- Hide button functionality
+    -- Hide button functionality (SIMPLE)
     lib.HideButton.MouseButton1Click:Connect(function()
         lib.MainFrame.Visible = not lib.MainFrame.Visible
-    end)
-
-    -- Hide button hover effects
-    lib.HideButton.MouseEnter:Connect(function()
-        lib.HideButton.BackgroundColor3 = Library.AccentColor
-    end)
-
-    lib.HideButton.MouseLeave:Connect(function()
-        lib.HideButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     end)
 
     -- Toggle UI function
     function lib:Toggle()
         lib.MainFrame.Visible = not lib.MainFrame.Visible
-        lib.HideButton.Visible = true
     end
 
     -- Add tab function
@@ -196,9 +165,9 @@ function Library:New(config)
         tab.Button = Instance.new("TextButton")
         tab.Button.Size = UDim2.new(0, 80, 1, 0)
         tab.Button.Position = UDim2.new(0, (#lib.Tabs * 85), 0, 0)
-        tab.Button.BackgroundColor3 = Library.SectionColor
+        tab.Button.BackgroundColor3 = Crona.SectionColor
         tab.Button.Text = name
-        tab.Button.TextColor3 = Library.SubTextColor
+        tab.Button.TextColor3 = Crona.SubTextColor
         tab.Button.Font = Enum.Font.Gotham
         tab.Button.TextSize = 14
         tab.Button.Parent = lib.TabsContainer
@@ -214,26 +183,13 @@ function Library:New(config)
         tab.Container.BackgroundTransparency = 1
         tab.Container.BorderSizePixel = 0
         tab.Container.ScrollBarThickness = 4
-        tab.Container.ScrollBarImageColor3 = Library.AccentColor
+        tab.Container.ScrollBarImageColor3 = Crona.AccentColor
         tab.Container.Visible = false
         tab.Container.Parent = lib.Content
         
         -- Tab click event
         tab.Button.MouseButton1Click:Connect(function()
             lib:SelectTab(tab)
-        end)
-        
-        -- Tab hover effects
-        tab.Button.MouseEnter:Connect(function()
-            if lib.CurrentTab ~= tab then
-                tab.Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            end
-        end)
-        
-        tab.Button.MouseLeave:Connect(function()
-            if lib.CurrentTab ~= tab then
-                tab.Button.BackgroundColor3 = Library.SectionColor
-            end
         end)
         
         table.insert(lib.Tabs, tab)
@@ -257,7 +213,7 @@ function Library:New(config)
             section.Container = Instance.new("Frame")
             section.Container.Size = UDim2.new(1, -10, 0, 40)
             section.Container.Position = UDim2.new(0, 5, 0, (#tab.Sections * 45) + 5)
-            section.Container.BackgroundColor3 = Library.SectionColor
+            section.Container.BackgroundColor3 = Crona.SectionColor
             section.Container.Parent = tab.Container
             
             local sectionCorner = Instance.new("UICorner")
@@ -270,7 +226,7 @@ function Library:New(config)
             section.Title.Position = UDim2.new(0, 10, 0, 10)
             section.Title.BackgroundTransparency = 1
             section.Title.Text = section.Name
-            section.Title.TextColor3 = Library.TextColor
+            section.Title.TextColor3 = Crona.TextColor
             section.Title.Font = Enum.Font.GothamBold
             section.Title.TextSize = 16
             section.Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -299,9 +255,9 @@ function Library:New(config)
                 
                 button.Button = Instance.new("TextButton")
                 button.Button.Size = UDim2.new(1, 0, 0, 30)
-                button.Button.BackgroundColor3 = Library.AccentColor
+                button.Button.BackgroundColor3 = Crona.AccentColor
                 button.Button.Text = button.Name
-                button.Button.TextColor3 = Library.TextColor
+                button.Button.TextColor3 = Crona.TextColor
                 button.Button.Font = Enum.Font.Gotham
                 button.Button.TextSize = 14
                 button.Button.Parent = button.Frame
@@ -309,15 +265,6 @@ function Library:New(config)
                 local buttonCorner = Instance.new("UICorner")
                 buttonCorner.CornerRadius = UDim.new(0, 6)
                 buttonCorner.Parent = button.Button
-                
-                -- Button hover effects
-                button.Button.MouseEnter:Connect(function()
-                    button.Button.BackgroundColor3 = Color3.fromRGB(167, 132, 239)
-                end)
-                
-                button.Button.MouseLeave:Connect(function()
-                    button.Button.BackgroundColor3 = Library.AccentColor
-                end)
                 
                 -- Button click event
                 button.Button.MouseButton1Click:Connect(function()
@@ -350,7 +297,7 @@ function Library:New(config)
                 toggle.Label.Size = UDim2.new(0.7, 0, 1, 0)
                 toggle.Label.BackgroundTransparency = 1
                 toggle.Label.Text = toggle.Name
-                toggle.Label.TextColor3 = Library.TextColor
+                toggle.Label.TextColor3 = Crona.TextColor
                 toggle.Label.Font = Enum.Font.Gotham
                 toggle.Label.TextSize = 14
                 toggle.Label.TextXAlignment = Enum.TextXAlignment.Left
@@ -370,7 +317,7 @@ function Library:New(config)
                 toggle.Slider = Instance.new("Frame")
                 toggle.Slider.Size = UDim2.new(0, 20, 0, 20)
                 toggle.Slider.Position = UDim2.new(0, 3, 0.5, -10)
-                toggle.Slider.BackgroundColor3 = Library.TextColor
+                toggle.Slider.BackgroundColor3 = Crona.TextColor
                 toggle.Slider.Parent = toggle.Button
                 
                 local sliderCorner = Instance.new("UICorner")
@@ -381,7 +328,7 @@ function Library:New(config)
                 local function updateToggle(state)
                     if state then
                         toggle.Slider.Position = UDim2.new(0, 27, 0.5, -10)
-                        toggle.Button.BackgroundColor3 = Library.AccentColor
+                        toggle.Button.BackgroundColor3 = Crona.AccentColor
                     else
                         toggle.Slider.Position = UDim2.new(0, 3, 0.5, -10)
                         toggle.Button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
@@ -404,7 +351,7 @@ function Library:New(config)
                 return toggle
             end
             
-            -- Add slider function for this section (FIXED - no button)
+            -- Add slider function (NO BUTTON - SIMPLE)
             function section:AddSlider(config)
                 config = config or {}
                 local slider = {
@@ -426,7 +373,7 @@ function Library:New(config)
                 slider.Label.Size = UDim2.new(1, 0, 0, 20)
                 slider.Label.BackgroundTransparency = 1
                 slider.Label.Text = slider.Name .. ": " .. slider.Default
-                slider.Label.TextColor3 = Library.TextColor
+                slider.Label.TextColor3 = Crona.TextColor
                 slider.Label.Font = Enum.Font.Gotham
                 slider.Label.TextSize = 14
                 slider.Label.TextXAlignment = Enum.TextXAlignment.Left
@@ -444,25 +391,12 @@ function Library:New(config)
                 
                 slider.Fill = Instance.new("Frame")
                 slider.Fill.Size = UDim2.new(0, 0, 1, 0)
-                slider.Fill.BackgroundColor3 = Library.AccentColor
+                slider.Fill.BackgroundColor3 = Crona.AccentColor
                 slider.Fill.Parent = slider.Background
                 
                 local fillCorner = Instance.new("UICorner")
                 fillCorner.CornerRadius = UDim.new(0, 7)
                 fillCorner.Parent = slider.Fill
-                
-                -- Slider handle (no button, just a visual element)
-                slider.Handle = Instance.new("Frame")
-                slider.Handle.Size = UDim2.new(0, 6, 2, 0)
-                slider.Handle.Position = UDim2.new(0, -3, -0.5, 0)
-                slider.Handle.BackgroundColor3 = Library.TextColor
-                slider.Handle.BorderSizePixel = 0
-                slider.Handle.ZIndex = 2
-                slider.Handle.Parent = slider.Fill
-                
-                local handleCorner = Instance.new("UICorner")
-                handleCorner.CornerRadius = UDim.new(0, 3)
-                handleCorner.Parent = slider.Handle
                 
                 -- Min and max labels
                 slider.MinLabel = Instance.new("TextLabel")
@@ -470,7 +404,7 @@ function Library:New(config)
                 slider.MinLabel.Position = UDim2.new(0, 0, 0, 40)
                 slider.MinLabel.BackgroundTransparency = 1
                 slider.MinLabel.Text = tostring(slider.Min)
-                slider.MinLabel.TextColor3 = Library.SubTextColor
+                slider.MinLabel.TextColor3 = Crona.SubTextColor
                 slider.MinLabel.Font = Enum.Font.Gotham
                 slider.MinLabel.TextSize = 12
                 slider.MinLabel.Parent = slider.Frame
@@ -480,7 +414,7 @@ function Library:New(config)
                 slider.MaxLabel.Position = UDim2.new(1, -30, 0, 40)
                 slider.MaxLabel.BackgroundTransparency = 1
                 slider.MaxLabel.Text = tostring(slider.Max)
-                slider.MaxLabel.TextColor3 = Library.SubTextColor
+                slider.MaxLabel.TextColor3 = Crona.SubTextColor
                 slider.MaxLabel.Font = Enum.Font.Gotham
                 slider.MaxLabel.TextSize = 12
                 slider.MaxLabel.TextXAlignment = Enum.TextXAlignment.Right
@@ -504,21 +438,20 @@ function Library:New(config)
                 slider:Update(slider.Default)
                 
                 -- Slider functionality (click and drag on the background)
-                local function updateSlider(input)
-                    if not input then return end
-                    
-                    local sliderAbsolutePosition = slider.Background.AbsolutePosition
-                    local sliderAbsoluteSize = slider.Background.AbsoluteSize
-                    
-                    local relativeX = (input.Position.X - sliderAbsolutePosition.X) / sliderAbsoluteSize.X
-                    relativeX = math.clamp(relativeX, 0, 1)
-                    
-                    local value = slider.Min + relativeX * (slider.Max - slider.Min)
-                    slider:Update(value)
-                end
-                
-                -- Make the entire slider background draggable
                 slider.Background.MouseButton1Down:Connect(function(input)
+                    local function updateSlider(input)
+                        if not input then return end
+                        
+                        local sliderAbsolutePosition = slider.Background.AbsolutePosition
+                        local sliderAbsoluteSize = slider.Background.AbsoluteSize
+                        
+                        local relativeX = (input.Position.X - sliderAbsolutePosition.X) / sliderAbsoluteSize.X
+                        relativeX = math.clamp(relativeX, 0, 1)
+                        
+                        local value = slider.Min + relativeX * (slider.Max - slider.Min)
+                        slider:Update(value)
+                    end
+                    
                     updateSlider(input)
                     
                     local connection
@@ -552,14 +485,14 @@ function Library:New(config)
     -- Select tab function
     function lib:SelectTab(tab)
         if lib.CurrentTab then
-            lib.CurrentTab.Button.BackgroundColor3 = Library.SectionColor
-            lib.CurrentTab.Button.TextColor3 = Library.SubTextColor
+            lib.CurrentTab.Button.BackgroundColor3 = Crona.SectionColor
+            lib.CurrentTab.Button.TextColor3 = Crona.SubTextColor
             lib.CurrentTab.Container.Visible = false
         end
         
         lib.CurrentTab = tab
-        tab.Button.BackgroundColor3 = Library.AccentColor
-        tab.Button.TextColor3 = Library.TextColor
+        tab.Button.BackgroundColor3 = Crona.AccentColor
+        tab.Button.TextColor3 = Crona.TextColor
         tab.Container.Visible = true
     end
     
@@ -568,4 +501,4 @@ function Library:New(config)
     return lib
 end
 
-return Library
+return Crona
